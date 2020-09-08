@@ -11,31 +11,34 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     while True:
         city = input("Enter the city you like to view data on between Chicago, New york, or Washington\n") # Get city of choice from user
-        if city.lower() == 'chicago' or city.lower() == 'new york' or city.lower() == 'washington':
+        if city.lower() == 'chicago' or city.lower() == 'new york' or city.lower() == 'washington': # If the city entered is either of the cities provided
             while True:
                 choice = input("Enter data filter type by month, day, both or not at all Type 'none' for no filter.\n") # Get the filter choice from user
-                if choice.lower() == 'month':
-                    month = choice
-                    break
-                elif choice.lower() == 'day':
-                    day = choice
-                    break
-                elif choice.lower() == 'both':
-                    month = 'yes'
-                    day = 'yes'
-                    break
-                elif choice.lower() == 'none':
-                    break
-                else:
+                if choice.lower() == 'month': # if the filter choice by the user is MONTH
+                    month = choice # assign the month variable to choice('month')
+                    break #break the loop
+                elif choice.lower() == 'day': # if the filter choice by the user is DAY
+                    day = choice # assign the day variable to choice('day')
+                    break #break the loop
+                elif choice.lower() == 'both': # if the filter choice by the user is BOTH
+                    month = 'yes' # assign the month variable to yes
+                    day = 'yes' # assign the day variable to yes
+                    break #break the loop
+                elif choice.lower() == 'none': # if the filter choice by the user is NONE
+                    break #break the loop, month and day will remain empty
+                else: # Invalid input continue running the loop
                     print('Invalid filter input, try again!') 
-                    continue
-            break
+                    continue 
+            break # break the external loop
         else:
             print("Invalid city name, try again")
             continue
-    print('-'*40)
+    print('-'*50)
     return city, month, day
-
+def load_data(city, month, day):
+    """Chicago"""
+    if city == chicago
+    return df
 def main():
     while True:
         city, month, day = get_filters()
