@@ -36,9 +36,15 @@ def get_filters():
                     break #break the loop
                 elif choice.lower() == 'both': # if the filter choice by the user is BOTH
                     while True:
+         
                         both = input("Enter Month (space) day(date): January 5\n")
-                        month = both.split(' ')[0] # assign the month variable to 
-                        day = both.split(' ')[1] # assign the day variable to 
+                        month = both.split(' ')[0] # assign the month variable to first value in both
+                        day = both.split(' ')[1] # assign the day variable to second value in both
+                        if month in months and day in days:
+                            break
+                        else:
+                            print("Invalid month or day, try again!")
+                            continue
                     break #break the loop
                 elif choice.lower() == 'none': # if the filter choice by the user is NONE
                     break #break the loop, month and day will remain empty
@@ -51,10 +57,17 @@ def get_filters():
             continue
     print('-'*50)
     return city, month, day
+
 def load_data(city, month, day):
+    
     """Chicago"""
-    if city.lower() == 'chicago':
-        df = pd.read_csv(CITY_DATA.get('chicago'))
+    if city.lower() == 'chicago': # if the city chosen by the user is chicago
+        df = pd.read_csv(CITY_DATA.get('chicago')) # read the chicago data set
+        df['Gender'].replace(np.nan,'Male',inplace=True) # replace the missing values in the gender column using mode since its a categorically represented
+        df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values 
+        """Month Filter"""
+        if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
+            df = df.loc[df['Start Time'].str[5:7]=='04']
         
     return df
 def main():
