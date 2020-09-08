@@ -7,6 +7,8 @@ CITY_DATA = { 'chicago': 'chicago.csv',
               'washington': 'washington.csv' }
 month = ''
 day = ''
+months = ['january','february','march','april','may','june']
+days = [str(i) for i in range(1,32)]
 def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     while True:
@@ -15,14 +17,28 @@ def get_filters():
             while True:
                 choice = input("Enter data filter type by month, day, both or not at all Type 'none' for no filter.\n") # Get the filter choice from user
                 if choice.lower() == 'month': # if the filter choice by the user is MONTH
-                    month = choice # assign the month variable to choice('month')
+                    while True:
+                        month = input("Enter Month: January, February, March, April, May or June\n") # Get the month to filter from user
+                        if month in months: # if month entered by user is in the months list break the loop
+                            break
+                        else: # else continue looping until the right input is entered
+                            print('Invalid month, try again!')
+                            continue
                     break #break the loop
                 elif choice.lower() == 'day': # if the filter choice by the user is DAY
-                    day = choice # assign the day variable to choice('day')
+                    while True:
+                        day = input("Enter Day(Date): 1,2,3,....,31\n") # Get the day to filter from user
+                        if day in days: # if day entered by user is in the days list break the loop
+                            break
+                        else: # else continue looping until the right input is entered
+                            print('Invalid date, try again!')
+                            continue                            
                     break #break the loop
                 elif choice.lower() == 'both': # if the filter choice by the user is BOTH
-                    month = 'yes' # assign the month variable to yes
-                    day = 'yes' # assign the day variable to yes
+                    while True:
+                        both = input("Enter Month (space) day(date): January 5\n")
+                        month = both.split(' ')[0] # assign the month variable to 
+                        day = both.split(' ')[1] # assign the day variable to 
                     break #break the loop
                 elif choice.lower() == 'none': # if the filter choice by the user is NONE
                     break #break the loop, month and day will remain empty
@@ -37,7 +53,9 @@ def get_filters():
     return city, month, day
 def load_data(city, month, day):
     """Chicago"""
-    if city == chicago
+    if city.lower() == 'chicago':
+        df = pd.read_csv(CITY_DATA.get('chicago'))
+        
     return df
 def main():
     while True:
