@@ -113,7 +113,7 @@ def load_data(city, month, day):
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df
         else:
-            pass        
+            pass
         
     
     return df
