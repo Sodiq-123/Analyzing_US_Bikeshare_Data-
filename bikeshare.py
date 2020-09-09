@@ -101,9 +101,21 @@ def load_data(city, month, day):
             df
         else:
             pass
+    # WASHINGTON
     elif city.lower == 'washington':
-        df = pd,read_csv('washington.csv')
+        df = pd.read_csv('washington.csv')
+        if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
+            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
+        elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
+            df = df.loc[df['Start Time'].str[8:10] == day]
+        elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
+            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month) & df['Start Time'].str[8:10] == day]
+        elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
+            df
+        else:
+            pass        
         
+    
     return df
 def main():
     while True:
