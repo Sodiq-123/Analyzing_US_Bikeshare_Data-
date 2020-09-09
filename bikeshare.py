@@ -15,7 +15,8 @@ for i in range(1,32): # loop 31 times
         days.append('0'+str(i))
     else:
         days.append(str(i))
-        
+months_dict = dict(zip(months, days)) # a dictionary of month names as keys and 01,02,03,04,05,06 as keys 
+
 def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     while True:
@@ -65,9 +66,7 @@ def get_filters():
             continue
     print('-'*50)
     return city, month, day
-
 def load_data(city, month, day):
-    months_dict = dict(zip(months, days))    
     #CHICAGO
     if city.lower() == 'chicago': # if the city chosen by the user is chicago
         df = pd.read_csv('chicago.csv') # read the chicago data set
@@ -75,7 +74,7 @@ def load_data(city, month, day):
         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values 
         df['Birth Year'] = df['Birth Year'].astype(int) # convert the entire birth year column to integer data type
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
+            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)] # return a dataframe where the slice of every value in the the Start time column at index 5 and 6 (month) is equal to the month entered by the user
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
             df = df.loc[df['Start Time'].str[8:10] == day]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
@@ -114,9 +113,23 @@ def load_data(city, month, day):
             df
         else:
             pass
-        
-    
     return df
+def time_stats(df):
+    """Displays statistics on the most frequent times of travel."""
+
+    print('\nCalculating The Most Frequent Times of Travel...\n')
+    start_time = time.time()
+    # display the most common month
+
+
+    # display the most common day of week
+
+
+    # display the most common start hour
+
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
 def main():
     while True:
         city, month, day = get_filters()
