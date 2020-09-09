@@ -9,9 +9,9 @@ CITY_DATA = { 'chicago': 'chicago.csv',
 month = '' # variable to hold the value for month
 day = '' # variable to hold the value for day
 months = ['january','february','march','april','may','june'] # list of months
-days = []
-for i in range(1,32):
-    if i <= 9:
+days = [] # list of days
+for i in range(1,32): # loop 31 times
+    if i <= 9: # 
         days.append('0'+str(i))
     else:
         days.append(str(i))
@@ -22,7 +22,7 @@ def get_filters():
         city = input("Enter the city you like to view data on between Chicago, New york, or Washington\n") # Get city of choice from user
         if city.lower() == 'chicago' or city.lower() == 'new york' or city.lower() == 'washington': # If the city entered is either of the cities provided
             while True:
-                choice = input("Enter data filter type by month, day, both or not at all Type 'none' for no filter.\n") # Get the filter choice from user
+                choice = input("For the "+city.upper()+" dataset enter data filter type by month, day, both or not at all Type 'none' for no filter.\n") # Get the filter choice from user
                 if choice.lower() == 'month': # if the filter choice by the user is MONTH
                     while True:
                         month = input("Enter Month: January, February, March, April, May or June\n") # Get the month to filter from user
@@ -53,6 +53,8 @@ def get_filters():
                             continue
                     break #break the loop
                 elif choice.lower() == 'none': # if the filter choice by the user is NONE
+                    month = ''
+                    day = ''
                     break #break the loop, month and day will remain empty
                 else: # Invalid input continue running the loop
                     print('Invalid filter input, try again!') 
@@ -65,23 +67,30 @@ def get_filters():
     return city, month, day
 
 def load_data(city, month, day):
-    days = []
-    for i in range(1,32):
-        if i <= 9:
-            days.append('0'+str(i))
-        else:
-            days.append(str(i))
-    months = ['january','february','march','april','may','june'] # list of months
     months_dict = dict(zip(months, days))    
-    """Chicago"""
+    #CHICAGO
     if city.lower() == 'chicago': # if the city chosen by the user is chicago
-        df = pd.read_csv(CITY_DATA.get('chicago')) # read the chicago data set
+        df = pd.read_csv('chicago.csv') # read the chicago data set
         df['Gender'].replace(np.nan,'Male',inplace=True) # replace the missing values in the gender column using mode since its a categorically represented
         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values 
+        df['Birth Year'] = df['Birth Year'].astype(int) # convert the entire birth year column to integer data type
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
             df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
-            df = df.loc[df['Start Time'].str[8:10] == ]            
+            df = df.loc[df['Start Time'].str[8:10] == day]
+        elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
+            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month) & df['Start Time'].str[8:10] == day]
+        elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
+            df
+        else:
+            pass
+    # NEW YORK
+    elif city.lower() == 'new york':
+        df = pd.read_csv('new_york_city.csv')
+        df['User Type'].replace(np.nan,'Subscriber',inplace=True) # replace the missing values in the user type column using mode since its a categorically represented
+        df['Gender'].replace(np.nan,'Male',inplace=True) # replace the missing values in the gender column using mode since its a categorically represented
+        df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values         
+        df['Birth Year'] = df['Birth Year'].astype(int) # convert the entire birth year column to integer data type
         
     return df
 def main():
