@@ -150,11 +150,15 @@ def station_stats(df):
     E_max_station = E_stations[E_stations == np.max(E_stations)].index[0]
     print("The most used end station is '{}' with the count of '{}' uses.".format(E_max_station, np.max(E_stations)))    
     # display most frequent combination of start station and end station trip
-    #stations = []
-    #stations.extend(df['Start Station'].to_list())
-    #stations.extend(df['End Station'].to_list())
-    #stations_dict = dict(zip(stations, [stations.count(i) for i in stations]))
-    #print(stations_dict)
+    start = df[['Start Station']] # create a dataframe of only the Start Stations   
+    end = df[['End Station']] # create a dataframe of only the End Stations 
+    start.columns = ['Stations'] # rename the column name to Stations
+    end.columns = ['Stations'] # rename the column name to Stations
+    start.append(end) # append the end data frame to the start data frame
+    startend_series = start['Stations'].value_counts() # returns a series of stations as indexes and count as values
+    start_end = startend_series[startend_series == np.max(startend_series)].index[0]
+    print("The most frequent combination of start station and end station trip is '{}' with the count of '{}' uses.".format(start_end, np.max(startend_series)))
+    
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 def main():
@@ -163,7 +167,7 @@ def main():
         df = load_data(city, month, day)
 
         time_stats(df,city, month, day)
-        #station_stats(df)
+        station_stats(df)
         #trip_duration_stats(df)
         #user_stats(df)
 
