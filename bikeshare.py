@@ -167,6 +167,7 @@ def trip_duration_stats(df):
     print('Calculating Trip Duration...\n')
     start_time = time.time()
     def time_data(seconds):
+        """Convert time in seconds to minute and hours"""
         seconds = int(seconds)
         seconds = seconds % (24 * 3600) 
         hour = seconds // 3600
@@ -189,18 +190,19 @@ def user_stats(df, city):
     print('Calculating User Stats...\n')
     start_time = time.time()
     # Display counts of user types
-    subscribers = len(df.loc[df['User Type'] == 'Subscriber'])
-    customers = len(df.loc[df['User Type'] == 'Customer'])
+    # The user type attribute of the dataframes contains 3 values; subscriber, customer and dependent
+    subscribers = len(df.loc[df['User Type'] == 'Subscriber']) # locate all rows within the User Type column where value is subscriber and count them
+    customers = len(df.loc[df['User Type'] == 'Customer']) 
     dependents = len(df.loc[df['User Type'] == 'Dependent'])
     print("There are {} Subscribers, {} Customers and {} Dependents within the {} Data".format(subscribers, customers, dependents, city))    
-    
-    if city.lower() == 'chicago' or city.lower() == 'new york':
+    # The Gender and Birth year attributes only exists in the chicago and new york data
+    if city.lower() == 'chicago' or city.lower() == 'new york': 
         # Display counts of gender
-        male = len(df.loc[df['Gender'] == 'Male'])
+        male = len(df.loc[df['Gender'] == 'Male']) # locate all rows within the Gender column where value is Malw and count them
         female = len(df.loc[df['Gender'] == 'Female'])   
         print("There are {} Males and {} Females within the {} Data".format(male, female, city)) 
         # Display earliest, most recent, and most common year of birth
-        year = df['Birth Year']
+        year = df['Birth Year'] # assign the Birth year column to a variable(series)
         print('\nIn the {} Data, the earliest year of birth is {},\nthe most recent is {} and the most common is {}.'.\
               format(city, str(np.min(year)), str(np.max(year)), str(np.bincount(year).argmax())))
         
