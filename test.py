@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
               'washington': 'washington.csv' }
@@ -11,11 +12,14 @@ int_num = int(num)
 print(int_num)
 
 df = pd.read_csv('chicago.csv')
-print(type(df))
 
-stations = []
-stations.extend(df['Start Station'].to_list())
-stations.extend(df['End Station'].to_list())
+def time_data(seconds):
+    seconds = seconds % (24 * 3600) 
+    hour = seconds // 3600
+    seconds %= 3600
+    minutes = seconds // 60
+    seconds %= 60
+    return ("The total travel time is {} hours {} minutes and {} seconds.".format(hour, minutes, seconds))
 
-stations_dict = dict(zip(stations, [stations.count(i) for i in stations]))
-print(stations_dict)
+print(np.sum(df['Trip Duration']))
+print(time_data(np.sum(df['Trip Duration'])))

@@ -160,7 +160,49 @@ def station_stats(df):
     print("The most frequent combination of start station and end station trip is '{}' with the count of '{}' uses.".format(start_end, np.max(startend_series)))
     
     print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*50)
+    
+def trip_duration_stats(df):
+    """Displays statistics on the total and average trip duration."""
+    print('Calculating Trip Duration...\n')
+    start_time = time.time()
+    def time_data(seconds):
+        seconds = int(seconds)
+        seconds = seconds % (24 * 3600) 
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        return hour, minutes, seconds
+    # display total travel time
+    total = time_data(np.sum(df['Trip Duration']))
+    print("The Total travel time is {} hours {} minutes and {} seconds.".format(total[0],total[1],total[2]))
+    # display mean travel time
+    mean = time_data(np.mean(df['Trip Duration']))
+    print("The Average travel time is {} hours {} minutes and {} seconds.".format(mean[0],mean[1],mean[2]))    
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*50)
+
+def user_stats(df):
+    """Displays statistics on bikeshare users."""
+
+    print('\nCalculating User Stats...\n')
+    start_time = time.time()
+
+    # Display counts of user types
+
+
+    # Display counts of gender
+
+
+    # Display earliest, most recent, and most common year of birth
+
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+
+
 def main():
     while True:
         city, month, day = get_filters()
@@ -168,7 +210,7 @@ def main():
 
         time_stats(df,city, month, day)
         station_stats(df)
-        #trip_duration_stats(df)
+        trip_duration_stats(df)
         #user_stats(df)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
