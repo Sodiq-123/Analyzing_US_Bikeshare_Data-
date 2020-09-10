@@ -79,7 +79,7 @@ def load_data(city, month, day):
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
             df = df.loc[df['Start Time'].str[8:10] == day]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month) & df['Start Time'].str[8:10] == day]
+            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
@@ -96,47 +96,67 @@ def load_data(city, month, day):
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
             df = df.loc[df['Start Time'].str[8:10] == day]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month) & df['Start Time'].str[8:10] == day]
+            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
             pass
     # WASHINGTON
-    elif city.lower == 'washington':
+    elif city.lower() == 'washington':
         df = pd.read_csv('washington.csv')
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
             df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
             df = df.loc[df['Start Time'].str[8:10] == day]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month) & df['Start Time'].str[8:10] == day]
+            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
             pass
-    
     return df
+
 def time_stats(df, city, month, day):
     """Displays statistics on the most frequent times of travel."""
     print('Calculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
-    if day == '' or month == '': # if day or month is empty it means there is NO filter option provivded by the user, so most common month can be displayed
+    if month == '': # if month is empty it means there is the dataframe is not month-filtered, so most common month can be displayed
         # display the most common month: Since the dataframe to be used within this function is filtered, most common month will only be calculated for a dataframe which is not month-filtered.
         m_series = df['Start Time'].str[5:7].value_counts() # slice every value in the start time column to extract the month number, group them by the number of occurences using value_counts, a series will be returned
         m = m_series[m_series == np.max(m_series)].index[0] # the series contains the month number as index and number of occurences as value, get the maximum value and return the index(month number)
         print("The most common month in the {} data is {}".format(city.upper(),months_dict_reversed.get(m)))
+    if day == '':
         # display the most common day of week: the most common day will only be calculated for a dataframe which is not day-filtered.
         d_series = df['Start Time'].str[8:10].value_counts()
         d = d_series[d_series == np.max(d_series)].index[0]
         print("The most common day in the {} data is {}".format(city.upper(), d))
-        # display the most common start hour
-        h_series = df['Start Time'].str[11:13].value_counts()
-        h = h_series[h_series == np.max(h_series)].index[0]
-        print("The most common start hour in the {} data is {}".format(city.upper(), h))        
-
-
+    # display the most common start hour
+    h_series = df['Start Time'].str[11:13].value_counts()
+    h = h_series[h_series == np.max(h_series)].index[0]
+    print("The most common start hour in the {} data is {} with a count of: {}".format(city.upper(), h, np.max(h_series)))        
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*50)
+    
+def station_stats(df):
+    """Displays statistics on the most popular stations and trip."""
+    print('Calculating The Most Popular Stations and Trip...\n')
+    start_time = time.time()
+    # display most commonly used start station
+    S_stations = df['Start Station'].value_counts()
+    S_max_station = S_stations[S_stations == np.max(S_stations)].index[0]
+    print("The most used start station is '{}' with the count of '{}' uses.".format(S_max_station, np.max(S_stations)))
+    # display most commonly used end station
+    E_stations = df['End Station'].value_counts()
+    E_max_station = E_stations[E_stations == np.max(E_stations)].index[0]
+    print("The most used end station is '{}' with the count of '{}' uses.".format(E_max_station, np.max(E_stations)))    
+    # display most frequent combination of start station and end station trip
+    #stations = []
+    #stations.extend(df['Start Station'].to_list())
+    #stations.extend(df['End Station'].to_list())
+    #stations_dict = dict(zip(stations, [stations.count(i) for i in stations]))
+    #print(stations_dict)
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
 def main():
     while True:
         city, month, day = get_filters()
