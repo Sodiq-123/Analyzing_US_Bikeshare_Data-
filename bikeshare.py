@@ -184,39 +184,42 @@ def trip_duration_stats(df):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*50)
 
-def user_stats(df):
+def user_stats(df, city):
     """Displays statistics on bikeshare users."""
-
-    print('\nCalculating User Stats...\n')
+    print('Calculating User Stats...\n')
     start_time = time.time()
-
     # Display counts of user types
-
-
-    # Display counts of gender
-
-
-    # Display earliest, most recent, and most common year of birth
-
-
+    subscribers = len(df.loc[df['User Type'] == 'Subscriber'])
+    customers = len(df.loc[df['User Type'] == 'Customer'])
+    dependents = len(df.loc[df['User Type'] == 'Dependent'])
+    print("There are {} Subscribers, {} Customers and {} Dependents within the {} Data".format(subscribers, customers, dependents, city))    
+    
+    if city.lower() == 'chicago' or city.lower() == 'new york':
+        # Display counts of gender
+        male = len(df.loc[df['Gender'] == 'Male'])
+        female = len(df.loc[df['Gender'] == 'Female'])   
+        print("There are {} Males and {} Females within the {} Data".format(male, female, city)) 
+        # Display earliest, most recent, and most common year of birth
+        year = df['Birth Year']
+        print('\nIn the {} Data, the earliest year of birth is {},\nthe most recent is {} and the most common is {}.'.\
+              format(city, str(np.min(year)), str(np.max(year)), str(np.bincount(year).argmax())))
+        
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
-
 
 def main():
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
 
-        time_stats(df,city, month, day)
+        time_stats(df, city, month, day)
         station_stats(df)
         trip_duration_stats(df)
-        #user_stats(df)
+        user_stats(df, city)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
-
 
 if __name__ == "__main__":
     main()
