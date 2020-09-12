@@ -7,14 +7,7 @@ CITY_DATA = { 'chicago': 'chicago.csv',
               'washington': 'washington.csv' }
 
 months = ['january','february','march','april','may','june'] # list of months
-days = [] # list of days
-for i in range(1,32): # loop 31 times
-    if i <= 9: # 
-        days.append('0'+str(i))
-    else:
-        days.append(str(i))
-months_dict = dict(zip(months, days)) # a dictionary of month names as keys and 01,02,03,04,05,06 as keys 
-months_dict_reversed = dict(zip(days, months)) # a dictionary of days 01,02,03,04,05,06 as keys and month names as values
+days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'] # list days
 def get_filters():
     month = '' # variable to hold the value for month
     day = '' # variable to hold the value for day    
@@ -35,7 +28,7 @@ def get_filters():
                     break #break the loop
                 elif choice.lower() == 'day': # if the filter choice by the user is DAY
                     while True:
-                        day = input("Enter Day(Date): 01,02,03,....,31\n") # Get the day to filter from user
+                        day = input("Enter Day: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday\n") # Get the day to filter from user
                         if day in days: # if day entered by user is in the days list break the loop
                             break
                         else: # else continue looping until the right input is entered
@@ -44,10 +37,10 @@ def get_filters():
                     break #break the loop
                 elif choice.lower() == 'both': # if the filter choice by the user is BOTH
                     while True:
-                        both = input("Enter Month (space) day(date): January 05\n")
-                        if both.split(' ')[0] in months and both.split(' ')[1] in days:
-                            month = both.split(' ')[0] # assign the month variable to first value in both
-                            day = both.split(' ')[1] # assign the day variable to second value in both                             
+                        both = input("Enter Month (space) day(date): January Friday\n")
+                        if both.split(' ')[0].lower() in months and both.split(' ')[1].lower() in days:
+                            month = both.split(' ')[0].lower() # assign the month variable to first value in both
+                            day = both.split(' ')[1].lower() # assign the day variable to second value in both                             
                             break
                         else:
                             print("Invalid month or day, try again!")
@@ -73,13 +66,15 @@ def load_data(city, month, day):
         df = pd.read_csv('chicago.csv') # read the chicago data set
         df['Gender'].replace(np.nan,'Male',inplace=True) # replace the missing values in the gender column using mode since its a categorically represented
         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values 
-        df['Birth Year'] = df['Birth Year'].astype(int) # convert the entire birth year column to integer data type
+        df['Birth Year'] = df['Birth Year'].astype(int) # convert the birth year column to integer data type
+        df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
+
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)] # return a dataframe where the slice of every value in the the Start time column at index 5 and 6 (month) is equal to the month entered by the user
+            df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
-            df = df.loc[df['Start Time'].str[8:10] == day]
+            df = df.loc[df['Start Time'].dt.day_name() == day.capitalize()]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
+            df = df.loc[(df['Start Time'].dt.month_name() == month.capitalize()) & (df['Start Time'].dt.day_name() == day.capitalize())]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
@@ -90,7 +85,9 @@ def load_data(city, month, day):
         df['User Type'].replace(np.nan,'Subscriber',inplace=True) # replace the missing values in the user type column using mode since its a categorically represented
         df['Gender'].replace(np.nan,'Male',inplace=True) # replace the missing values in the gender column using mode since its a categorically represented
         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values         
-        df['Birth Year'] = df['Birth Year'].astype(int) # convert the entire birth year column to integer data type
+        df['Birth Year'] = df['Birth Year'].astype(int) # convert the birth year column to integer data type
+        df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
+        
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
             df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY

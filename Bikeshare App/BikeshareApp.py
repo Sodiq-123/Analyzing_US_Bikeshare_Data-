@@ -108,8 +108,8 @@ class Bikeshare:
                 self.canvas.place_forget()
                 self.status.configure(text='')
                 #==========================Filter Options==========================
-                self.info4 = Label(self.master,text='Filter Option',font=('arial',13,'bold'),fg=foreground,bg=background)
-                self.info4.place(x=350,y=15)                            
+                self.info4 = Label(self.master,text='Filter Option',font=('arial',15,'bold'),fg=foreground,bg=background)
+                self.info4.place(x=290,y=15)                            
                 def check_box():
                     if m.get() == 1:
                         self.month_box.configure(state=NORMAL)
@@ -133,10 +133,10 @@ class Bikeshare:
                 
                 self.day_box = ttk.Combobox(self.master,width=10,font=("normal",10),state=DISABLED)
                 self.day_box.insert(0,'')
-                self.day_box['values'] = [str(i) for i in range(1,32)]
+                self.day_box['values'] = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
                 self.day_box.place(x=425,y=90)                            
                              
-                self.continue_btn.place(x=350,y=130,width=100,height=28)
+                self.continue_btn.place(x=357,y=130,width=100,height=28)
                 self.continue_btn.configure(command=None)                
                 #thread = threading.Thread(target=loop)
                 #thread.start()                   
