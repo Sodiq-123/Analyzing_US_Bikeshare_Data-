@@ -17,9 +17,9 @@ import time
 class Bikeshare:
     def __init__(self, master):
         #243447
-        background = '#ffffff' 
+        background = '#243447' 
         background2 = 'gray98'
-        foreground = '#050716'
+        foreground = '#ffffff'
         master.iconbitmap("icon.ico") #window icon
         self.master = master #root window
         self.master.title("Bikeshare") #window title
@@ -59,53 +59,93 @@ class Bikeshare:
                 self.washington.place_forget()
                 self.new_york.place_forget()
                 
-                if i.get() == 1:
-                    country = 'Chicago'
-                    
-                def loop():
-                    self.canvas = Canvas(self.master,width=80,height=20,bg=background,highlightbackground=background)
-                    self.canvas.place(x=350,y=260)
-                    
-                    self.load1 = self.canvas.create_image(7,10,image=self.image3)
-                    self.load2 = self.canvas.create_image(7,10,image=self.image3)
-                    self.load3 = self.canvas.create_image(7,10,image=self.image3)  
-                    self.status.configure(text='Establishing link to database...')
-                    while True:
-                        for i in range(0,25):
-                            self.canvas.move(self.load1,2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02)       
-                            self.status.configure(text='Connecting to '+country+' database...')
-                        for i in range(0,25):
-                            self.canvas.move(self.load2,2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02) 
-                            self.status.configure(text='Checking for missing values...')
-                        for i in range(0,25):
-                            self.canvas.move(self.load3,2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02)         
-                        for i in range(0,25):
-                            self.canvas.move(self.load1,-2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02)       
-                            self.status.configure(text='Handling missing values...')
-                        for i in range(0,25):
-                            self.canvas.move(self.load2,-2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02) 
-                        for i in range(0,25):
-                            self.canvas.move(self.load3,-2,0)                  
-                            self.canvas.update()
-                            time.sleep(0.02)   
-                            self.status.configure(text='Finishing up...')
-                thread = threading.Thread(target=loop)
-                thread.start()                   
+                if c.get() == 1:
+                    city = 'Chicago'
+                elif c.get() == 2:
+                    city = 'Washington'
+                elif c.get() == 3:
+                    city = 'New York City'
+                else:
+                    pass
+
+                #def loop():
+                self.canvas = Canvas(self.master,width=80,height=20,bg=background,highlightbackground=background)
+                self.canvas.place(x=350,y=260)
                 
-            i = IntVar()
-            self.chicago = Checkbutton(self.master,text='Chicago',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=1,offvalue=0,variable=i,command=choice)
-            self.washington = Checkbutton(self.master,text='Washington',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=2,offvalue=0,variable=i,command=choice)
-            self.new_york = Checkbutton(self.master,text='New York City',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=3,offvalue=0,variable=i,command=choice)
+                self.load1 = self.canvas.create_image(7,10,image=self.image3)
+                self.load2 = self.canvas.create_image(7,10,image=self.image3)
+                self.load3 = self.canvas.create_image(7,10,image=self.image3)  
+                self.status.configure(text='Connecting to '+city+' database...')
+                count = 0
+                """while True:
+                    for i in range(0,25):
+                    self.canvas.move(self.load1,2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02)       
+                    for i in range(0,25):
+                        self.canvas.move(self.load2,2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02) 
+                    for i in range(0,25):
+                        self.canvas.move(self.load3,2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02)         
+                    for i in range(0,25):
+                        self.canvas.move(self.load1,-2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02)       
+                    for i in range(0,25):
+                        self.canvas.move(self.load2,-2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02) 
+                    for i in range(0,25):
+                        self.canvas.move(self.load3,-2,0)                  
+                        self.canvas.update()
+                        time.sleep(0.02)   
+                        self.status.configure(text='Finishing up...')
+                    count += 1
+                    if count == 1:    """
+                self.canvas.place_forget()
+                self.status.configure(text='')
+                #==========================Filter Options==========================
+                self.info4 = Label(self.master,text='Filter Option',font=('arial',13,'bold'),fg=foreground,bg=background)
+                self.info4.place(x=350,y=15)                            
+                def check_box():
+                    if m.get() == 1:
+                        self.month_box.configure(state=NORMAL)
+                    else:
+                        self.month_box.configure(state=DISABLED)
+                    if d.get() == 1:
+                        self.day_box.configure(state=NORMAL)
+                    else:
+                        self.day_box.configure(state=DISABLED)                       
+                m = IntVar()
+                d = IntVar()
+                self.month_btn = Checkbutton(self.master,text='Month',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=1,offvalue=0,variable=m,command=check_box)
+                self.day_btn = Checkbutton(self.master,text='Day',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=1,offvalue=0,variable=d,command=check_box)                
+                self.month_btn.place(x=290,y=60) 
+                self.day_btn.place(x=420,y=60)  
+                
+                self.month_box = ttk.Combobox(self.master,width=10,font=("normal",10),state=DISABLED)
+                self.month_box.insert(0,'')
+                self.month_box['values'] = ("January","Ferbuary","March","April","May","June")
+                self.month_box.place(x=295,y=90)
+                
+                self.day_box = ttk.Combobox(self.master,width=10,font=("normal",10),state=DISABLED)
+                self.day_box.insert(0,'')
+                self.day_box['values'] = [str(i) for i in range(1,32)]
+                self.day_box.place(x=425,y=90)                            
+                             
+                self.continue_btn.place(x=350,y=130,width=100,height=28)
+                self.continue_btn.configure(command=None)                
+                #thread = threading.Thread(target=loop)
+                #thread.start()                   
+                
+                
+            c = IntVar()
+            self.chicago = Checkbutton(self.master,text='Chicago',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=1,offvalue=0,variable=c,command=choice)
+            self.washington = Checkbutton(self.master,text='Washington',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=2,offvalue=0,variable=c,command=choice)
+            self.new_york = Checkbutton(self.master,text='New York City',bg=background,fg=foreground,activebackground=background,font=("arial",11),onvalue=3,offvalue=0,variable=c,command=choice)
             self.chicago.place(x=210,y=60) 
             self.washington.place(x=331,y=60)  
             self.new_york.place(x=470,y=60)
