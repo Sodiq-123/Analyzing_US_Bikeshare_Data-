@@ -12,4 +12,4 @@ int_num = int(num)
 print(int_num)
 
 month = "march"
-print(month.capitalize())
+print(months[1])

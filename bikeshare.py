@@ -87,13 +87,13 @@ def load_data(city, month, day):
         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values         
         df['Birth Year'] = df['Birth Year'].astype(int) # convert the birth year column to integer data type
         df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
-        
+
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
+            df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
-            df = df.loc[df['Start Time'].str[8:10] == day]
+            df = df.loc[df['Start Time'].dt.day_name() == day.capitalize()]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
+            df = df.loc[(df['Start Time'].dt.month_name() == month.capitalize()) & (df['Start Time'].dt.day_name() == day.capitalize())]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
@@ -101,12 +101,14 @@ def load_data(city, month, day):
     # WASHINGTON
     elif city.lower() == 'washington':
         df = pd.read_csv('washington.csv')
+        df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
+
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
-            df = df.loc[df['Start Time'].str[5:7] == months_dict.get(month)]
+            df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
-            df = df.loc[df['Start Time'].str[8:10] == day]
+            df = df.loc[df['Start Time'].dt.day_name() == day.capitalize()]
         elif month != '' and day != '': # if month is not empty and day is not empty means we are filtering BOTH
-            df = df.loc[(df['Start Time'].str[5:7] == months_dict.get(month)) & (df['Start Time'].str[8:10] == day)]
+            df = df.loc[(df['Start Time'].dt.month_name() == month.capitalize()) & (df['Start Time'].dt.day_name() == day.capitalize())]
         elif month == '' and day == '': # if month and day is empty it means we are NOT filtering  
             df = df.copy()
         else:
@@ -119,16 +121,16 @@ def time_stats(df, city, month, day):
     start_time = time.time()
     if month == '': # if month is empty it means there is the dataframe is not month-filtered, so most common month can be displayed
         # display the most common month: Since the dataframe to be used within this function is filtered, most common month will only be calculated for a dataframe which is not month-filtered.
-        m_series = df['Start Time'].str[5:7].value_counts() # slice every value in the start time column to extract the month number, group them by the number of occurences using value_counts, a series will be returned
-        m = m_series[m_series == np.max(m_series)].index[0] # the series contains the month number as index and number of occurences as value, get the maximum value and return the index(month number)
-        print("The most common month in the {} data is {}".format(city.upper(),months_dict_reversed.get(m)))
+        m_series = df['Start Time'].dt.month_name().value_counts() # return month names, group them by the number of occurences using value_counts, a series will be returned
+        m = m_series[m_series == np.max(m_series)].index[0] # the series contains the month as index and number of occurences as value, get the maximum value and return the index(month)
+        print("The most common month in the {} data is {}".format(city.upper(), m))
     if day == '':
         # display the most common day of week: the most common day will only be calculated for a dataframe which is not day-filtered.
-        d_series = df['Start Time'].str[8:10].value_counts()
+        d_series = df['Start Time'].dt.day_name().value_counts()
         d = d_series[d_series == np.max(d_series)].index[0]
         print("The most common day in the {} data is {}".format(city.upper(), d))
     # display the most common start hour
-    h_series = df['Start Time'].str[11:13].value_counts()
+    h_series = df['Start Time'].dt.hour.value_counts()
     h = h_series[h_series == np.max(h_series)].index[0]
     print("The most common start hour in the {} data is {} with a count of: {}".format(city.upper(), h, np.max(h_series)))        
     print("\nThis took %s seconds." % (time.time() - start_time))
