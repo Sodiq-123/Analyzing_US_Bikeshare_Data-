@@ -12,4 +12,5 @@ int_num = int(num)
 print(int_num)
 
 month = "march"
-print(months[1])
+months.insert(0,'december')
+print(months)

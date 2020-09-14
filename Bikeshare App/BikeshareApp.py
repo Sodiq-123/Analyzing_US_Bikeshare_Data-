@@ -224,6 +224,7 @@ class Bikeshare:
                     elif city == 'washington':
                         self.status.configure(text="Fetching Washington data...")
                         df = pd.read_csv('../washington.csv')
+                        df['Trip Duration'] = df['Trip Duration'].astype(int) # convert the Trip Duration column to integer data type
                         df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
                         
                         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
@@ -242,8 +243,8 @@ class Bikeshare:
                     #==========================Statistics and plots==========================
                     plots = []
                     labels = []
-                    #=======Time Stats========
                     self.plot_frame.place(x=0,y=20,width=800,height=490)
+                    #=======Time Stats========            
                     def time_stats():   
                         """Displays statistics on the most frequent times of travel."""
                         self.status.configure(text='Calculating The Most Frequent Times of Travel...')
@@ -254,9 +255,9 @@ class Bikeshare:
                             label1 = "The most common month in the {} data is {}".format(city.upper(),m)
                             #======Plot======
                             m_figure1 = Figure(figsize=(8,6), dpi=70)
-                            m_figure1.suptitle("Monthly count of the {} data".format(city.upper()))
+                            m_figure1.suptitle("Bar Chart for Monthly Count of the {} Data".format(city.upper()))
                             m_plot1 = m_figure1.add_subplot(111)
-                            m_plot1.bar(df['Start Time'].dt.month_name().unique(), m_series.values, color=background)
+                            m_plot1.bar(m_series.index, m_series.values, color=background)
                             
                             self.canvas_plot1 = FigureCanvasTkAgg(m_figure1, self.plot_frame)
                             self.canvas_plot1.draw()
@@ -270,9 +271,9 @@ class Bikeshare:
                             label2 = "The most common day in the {} data is {}".format(city.upper(), d)
                             #=====Plot======
                             m_figure2 = Figure(figsize=(8,6), dpi=70)
-                            m_figure2.suptitle("Daily count of the {} data".format(city.upper()))
+                            m_figure2.suptitle("Bar Chart for Daily Count in the {} Data".format(city.upper()))
                             m_plot2 = m_figure2.add_subplot(111)
-                            m_plot2.bar(df['Start Time'].dt.day_name().unique(), d_series.values, color=background)
+                            m_plot2.bar(d_series.index, d_series.values, color=background)
                             
                             self.canvas_plot2 = FigureCanvasTkAgg(m_figure2, self.plot_frame)
                             self.canvas_plot2.draw()
@@ -283,35 +284,157 @@ class Bikeshare:
                         h = h_series[h_series == np.max(h_series)].index[0]
                         label3 = "The most common start hour in the {} data is {} with a count of: {}".format(city.upper(), h, np.max(h_series))
                         #=====Plot======
-                        m_figure3 = Figure(figsize=(8,6), dpi=70)
-                        m_figure3.suptitle("Daily count of the {} data".format(city.upper()))
+                        m_figure3 = Figure(figsize=(11,6), dpi=70)
+                        m_figure3.suptitle("Bar Chart for Start Hour of the {} Data".format(city.upper()))
                         m_plot3 = m_figure3.add_subplot(111)
-                        m_plot3.bar(df['Start Time'].dt.hour.unique(), h_series.values, color=background)
+                        m_plot3.bar(h_series.index, h_series.values, color=background)
                         
                         self.canvas_plot3 = FigureCanvasTkAgg(m_figure3, self.plot_frame)
                         self.canvas_plot3.draw()
                         plots.append(self.canvas_plot3)  
                         labels.append(label3)
                     
+                    def station_stats():
+                        """Displays statistics on the most popular stations and trip."""
+                        self.status.configure(text='Calculating The Most Popular Stations and Trip...')
+                        # display most commonly used start station
+                        S_stations = df['Start Station'].value_counts()
+                        S_max_station = S_stations[S_stations == np.max(S_stations)].index[0]
+                        label4 = "The most used start station is '{}' with the count of '{}' uses.".format(S_max_station, np.max(S_stations))
+                        #=====Plot=====
+                        m_figure4 = Figure(figsize=(13,7), dpi=60)
+                        m_figure4.suptitle("Dot Plot for Start Stations in the {} data".format(city.upper()))
+                        m_plot4 = m_figure4.add_subplot(111)
+                        m_plot4.hlines(y=list(S_stations.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot4.scatter(y=list(S_stations.index)[0:15], x=list(S_stations.values)[0:15], s=75, alpha=0.7, color=background)
+                        m_plot4.set_yticklabels(S_stations.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
+                        
+                        self.canvas_plot4 = FigureCanvasTkAgg(m_figure4, self.plot_frame)
+                        self.canvas_plot4.draw()
+                        plots.append(self.canvas_plot4)  
+                        labels.append(label4)
+                        
+                        # display most commonly used end station
+                        E_stations = df['End Station'].value_counts()
+                        E_max_station = E_stations[E_stations == np.max(E_stations)].index[0]
+                        label5 = "The most used end station is '{}' with the count of '{}' uses.".format(E_max_station, np.max(E_stations))   
+                        #=====Plot=====
+                        m_figure5 = Figure(figsize=(13,7), dpi=60)
+                        m_figure5.suptitle("Dot Plot for End Stations in the {} data".format(city.upper()))
+                        m_plot5 = m_figure5.add_subplot(111)
+                        m_plot5.hlines(y=list(E_stations.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot5.scatter(y=list(E_stations.index)[0:15], x=list(E_stations.values)[0:15], s=75, alpha=0.7, color=background)
+                        m_plot5.set_yticklabels(E_stations.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
+                        
+                        self.canvas_plot5 = FigureCanvasTkAgg(m_figure5, self.plot_frame)
+                        self.canvas_plot5.draw()
+                        plots.append(self.canvas_plot5)  
+                        labels.append(label5)                        
+                        # display most frequent combination of start station and end station trip
+                        start = df[['Start Station']] # create a dataframe of only the Start Stations   
+                        end = df[['End Station']] # create a dataframe of only the End Stations 
+                        start.columns = ['Stations'] # rename the column name to Stations
+                        end.columns = ['Stations'] # rename the column name to Stations
+                        start.append(end) # append the end data frame to the start data frame
+                        startend_series = start['Stations'].value_counts() # returns a series of stations as indexes and count as values
+                        start_end = startend_series[startend_series == np.max(startend_series)].index[0]
+                        label6 = "The most used start and end station trip is '{}' with count of '{}' uses.".format(start_end, np.max(startend_series))                    
+                        #=====Plot=====
+                        m_figure6 = Figure(figsize=(13,7), dpi=60)
+                        m_figure6.suptitle("Dot Plot for End and Start Stations in the {} data".format(city.upper()))
+                        m_plot6 = m_figure6.add_subplot(111)
+                        m_plot6.hlines(y=list(startend_series.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot6.scatter(y=list(startend_series.index)[0:15], x=list(startend_series.values)[0:15], s=75, alpha=0.7, color=background)
+                        m_plot6.set_yticklabels(startend_series.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
+                        
+                        self.canvas_plot6 = FigureCanvasTkAgg(m_figure6, self.plot_frame)
+                        self.canvas_plot6.draw()
+                        plots.append(self.canvas_plot6)  
+                        labels.append(label6) 
+                        
+                        
+                    def trip_duration_stats():
+                        """Displays statistics on the total and average trip duration."""
+                        self.status.configure(text='Calculating Trip Duration...')
+                        def time_data(seconds):
+                            """Convert time in seconds to minute and hours"""
+                            seconds = int(seconds)
+                            seconds = seconds % (24 * 3600) 
+                            hour = seconds // 3600
+                            seconds %= 3600
+                            minutes = seconds // 60
+                            seconds %= 60
+                            return hour, minutes, seconds
+                        
+                        td_series = df['Trip Duration'].value_counts()
+                        total = time_data(np.sum(df['Trip Duration'])) # display total travel time
+                        mean = time_data(np.mean(df['Trip Duration'])) # display mean travel time                                 
+                        label7 = "The Total travel time is {} hours {} minutes and {} seconds.".format(total[0],total[1],total[2])+"\nThe Average travel time is {} hours {} minutes and {} seconds.".format(mean[0],mean[1],mean[2])
+                        
+                        #=====Plot======
+                        m_figure7 = Figure(figsize=(11,6), dpi=70)
+                        m_figure7.suptitle("Line Plot for Trip Duration of the {} Data".format(city.upper()))
+                        m_plot7 = m_figure7.add_subplot(111)
+                        m_plot7.plot(list(td_series.values), list(td_series.index), color=background)
+                        m_plot7.set_ylabel('Trip Duration in Seconds')
+                        m_plot7.set_xlabel('Count')
+                        
+                        self.canvas_plot7 = FigureCanvasTkAgg(m_figure7, self.plot_frame)
+                        self.canvas_plot7.draw()
+                        plots.append(self.canvas_plot7)  
+                        labels.append(label7)                        
+                        
+                        
                     #==========Start Loading========== 
                     #thread = threading.Thread(target=loop('no'))
                     #thread.start()    
-                    
-                    
+                    #=====Call statistics and plot functions=======
                     time_stats()
+                    station_stats()
+                    trip_duration_stats()
+                    
                     plots[0].get_tk_widget().pack(side=TOP)
                     self.plot_info.pack(side=BOTTOM)
                     self.plot_info.configure(text=labels[0])
-                    index = 1
-                    def _next():
-                        for plot in self.plot_frame.winfo_children():
-                            plot.pack_forget()
-                        plots[index].get_tk_widget().pack(side=TOP)    
-                        self.plot_info.configure(text=labels[index])
-                        #index += 1
                     
+                    next_plots = plots.copy()
+                    next_labels = labels.copy()
+                    previous_plots = []
+                    previous_labels = []
+                    
+                    #=====================Next Plot====================
+                    def _next():
+                        if len(next_plots) == 0:
+                            tkinter.messagebox.showwarning("","This is the last plot")
+                        else:
+                            for plot in self.plot_frame.winfo_children():
+                                plot.pack_forget()
+                            next_plots[0].get_tk_widget().pack(side=TOP)  
+                            self.plot_info.pack(side=BOTTOM)
+                            self.plot_info.configure(text=next_labels[0])
+                            previous_plots.insert(0,next_plots[0])
+                            previous_labels.insert(0,next_labels[0])
+                            next_plots.pop(0)
+                            next_labels.pop(0)
+                    #================Previous Plot===================
+                    def _previous():
+                        if len(previous_plots) == 0:
+                            tkinter.messagebox.showwarning("","This is the first plot")
+                        else:
+                            for plot in self.plot_frame.winfo_children():
+                                plot.pack_forget() 
+                            previous_plots[0].get_tk_widget().pack(side=TOP)  
+                            self.plot_info.pack(side=BOTTOM)
+                            self.plot_info.configure(text=previous_labels[0])
+                            next_plots.insert(0,previous_plots[0])
+                            next_labels.insert(0,previous_labels[0])
+                            previous_plots.pop(0)
+                            previous_labels.pop(0)                            
+                    
+                    self.previous_btn = Button(self.master,text='<',font=('normal',35),fg=foreground,bd=0,relief='flat',bg=background,activebackground=background,command=_previous)
+                    self.previous_btn.place(x=15,y=440)
                     self.next_btn = Button(self.master,text='>',font=('normal',35),fg=foreground,bd=0,relief='flat',bg=background,activebackground=background,command=_next)
-                    self.next_btn.place(x=733,y=240)
+                    self.next_btn.place(x=733,y=440)
                 self.continue_btn.place(x=357,y=130,width=100,height=28)
                 self.continue_btn.configure(command=_continue2)                
                                   

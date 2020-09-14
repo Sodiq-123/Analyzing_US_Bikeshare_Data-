@@ -102,7 +102,7 @@ def load_data(city, month, day):
     elif city.lower() == 'washington':
         df = pd.read_csv('washington.csv')
         df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
-
+        df['Trip Duration'] = df['Trip Duration'].astype(int) # convert the Trip Duration column to integer data type
         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
             df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
