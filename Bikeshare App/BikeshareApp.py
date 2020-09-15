@@ -189,6 +189,7 @@ class Bikeshare:
                         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values 
                         df['Birth Year'] = df['Birth Year'].astype(int) # convert the birth year column to integer data type
                         df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
+                        df['Trip Duration'] = df['Trip Duration'].astype(int) # convert the Trip Duration column to integer data type
                         
                         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
                             df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
@@ -209,7 +210,8 @@ class Bikeshare:
                         df['Birth Year'].replace(np.nan,df['Birth Year'].mean(),inplace=True) # replace the missing values in the birth year column using mean since it contains contionous values         
                         df['Birth Year'] = df['Birth Year'].astype(int) # convert the birth year column to integer data type
                         df['Start Time'] = pd.to_datetime(df['Start Time']) # convert the start time column to datetime data type
-
+                        df['Trip Duration'] = df['Trip Duration'].astype(int) # convert the Trip Duration column to integer data type
+                        
                         if month != '' and day == '': # if month is not empty and day is empty means we are filtering by MONTH
                             df = df.loc[df['Start Time'].dt.month_name() == month.capitalize()] # return a dataframe where the month name equal to the month entered by the user
                         elif month == '' and day != '': # if month is empty and day is not empty means we are filtering by DAY
@@ -300,12 +302,12 @@ class Bikeshare:
                         # display most commonly used start station
                         S_stations = df['Start Station'].value_counts()
                         S_max_station = S_stations[S_stations == np.max(S_stations)].index[0]
-                        label4 = "The most used start station is '{}' with the count of '{}' uses.".format(S_max_station, np.max(S_stations))
+                        label4 = "The most used start station is '{}' with the count of '{}' uses.".format(S_max_station, np.max(S_stations))                       
                         #=====Plot=====
                         m_figure4 = Figure(figsize=(13,7), dpi=60)
                         m_figure4.suptitle("Dot Plot for Start Stations in the {} data".format(city.upper()))
                         m_plot4 = m_figure4.add_subplot(111)
-                        m_plot4.hlines(y=list(S_stations.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot4.hlines(y=list(S_stations.index)[0:15], xmin=0, xmax=np.max(S_stations), color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
                         m_plot4.scatter(y=list(S_stations.index)[0:15], x=list(S_stations.values)[0:15], s=75, alpha=0.7, color=background)
                         m_plot4.set_yticklabels(S_stations.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
                         
@@ -322,7 +324,7 @@ class Bikeshare:
                         m_figure5 = Figure(figsize=(13,7), dpi=60)
                         m_figure5.suptitle("Dot Plot for End Stations in the {} data".format(city.upper()))
                         m_plot5 = m_figure5.add_subplot(111)
-                        m_plot5.hlines(y=list(E_stations.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot5.hlines(y=list(E_stations.index)[0:15], xmin=0, xmax=np.max(E_stations), color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
                         m_plot5.scatter(y=list(E_stations.index)[0:15], x=list(E_stations.values)[0:15], s=75, alpha=0.7, color=background)
                         m_plot5.set_yticklabels(E_stations.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
                         
@@ -343,7 +345,7 @@ class Bikeshare:
                         m_figure6 = Figure(figsize=(13,7), dpi=60)
                         m_figure6.suptitle("Dot Plot for End and Start Stations in the {} data".format(city.upper()))
                         m_plot6 = m_figure6.add_subplot(111)
-                        m_plot6.hlines(y=list(startend_series.index)[0:15], xmin=0, xmax=8000, color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
+                        m_plot6.hlines(y=list(startend_series.index)[0:15], xmin=0, xmax=np.max(startend_series), color='gray', alpha=0.7, linewidth=1, linestyles='dashdot')
                         m_plot6.scatter(y=list(startend_series.index)[0:15], x=list(startend_series.values)[0:15], s=75, alpha=0.7, color=background)
                         m_plot6.set_yticklabels(startend_series.index[0:15].str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})
                         
@@ -352,46 +354,78 @@ class Bikeshare:
                         plots.append(self.canvas_plot6)  
                         labels.append(label6) 
                         
-                        
-                    def trip_duration_stats():
-                        """Displays statistics on the total and average trip duration."""
-                        self.status.configure(text='Calculating Trip Duration...')
-                        def time_data(seconds):
-                            """Convert time in seconds to minute and hours"""
-                            seconds = int(seconds)
-                            seconds = seconds % (24 * 3600) 
-                            hour = seconds // 3600
-                            seconds %= 3600
-                            minutes = seconds // 60
-                            seconds %= 60
-                            return hour, minutes, seconds
-                        
-                        td_series = df['Trip Duration'].value_counts()
-                        total = time_data(np.sum(df['Trip Duration'])) # display total travel time
-                        mean = time_data(np.mean(df['Trip Duration'])) # display mean travel time                                 
-                        label7 = "The Total travel time is {} hours {} minutes and {} seconds.".format(total[0],total[1],total[2])+"\nThe Average travel time is {} hours {} minutes and {} seconds.".format(mean[0],mean[1],mean[2])
-                        
+                    def user_stats():
+                        """Displays statistics on bikeshare users."""
+                        self.status.configure(text='Calculating User Stats...')
+                        # Display counts of user types
+                        # The user type attribute of the dataframes contains 3 values; subscriber, customer and dependent
+                        subscribers = len(df.loc[df['User Type'] == 'Subscriber']) # locate all rows within the User Type column where value is subscriber and count them
+                        customers = len(df.loc[df['User Type'] == 'Customer']) 
+                        dependents = len(df.loc[df['User Type'] == 'Dependent'])
+                        label7 = "There are {} Subscribers, {} Customers and {} Dependent in the {} Data".format(subscribers, customers, dependents, city)   
                         #=====Plot======
-                        m_figure7 = Figure(figsize=(11,6), dpi=70)
-                        m_figure7.suptitle("Line Plot for Trip Duration of the {} Data".format(city.upper()))
+                        df_user = df['User Type'].value_counts()
+                        sizes = df_user.values
+                        label = df_user.index
+                        explode = []
+                        if len(sizes) == 3:
+                            explode.extend([0.1,0,0])
+                        else:
+                            explode.extend([0.1,0])
+                        m_figure7 = Figure(figsize=(8,6), dpi=70)
+                        m_figure7.suptitle("Pie Chart for Types of Users for the {} Data".format(city.upper()))
                         m_plot7 = m_figure7.add_subplot(111)
-                        m_plot7.plot(list(td_series.values), list(td_series.index), color=background)
-                        m_plot7.set_ylabel('Trip Duration in Seconds')
-                        m_plot7.set_xlabel('Count')
+                        m_plot7.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
                         
                         self.canvas_plot7 = FigureCanvasTkAgg(m_figure7, self.plot_frame)
                         self.canvas_plot7.draw()
                         plots.append(self.canvas_plot7)  
                         labels.append(label7)                        
-                        
-                        
+                        # The Gender and Birth year attributes only exists in the chicago and new york data
+                        if city == 'chicago' or city == 'new york': 
+                            # Display counts of gender
+                            male = len(df.loc[df['Gender'] == 'Male']) # locate all rows within the Gender column where value is Malw and count them
+                            female = len(df.loc[df['Gender'] == 'Female'])   
+                            label8 = "There are {} Males and {} Females within the {} Data".format(male, female, city)
+                            #=====Plot======
+                            df_gender = df['Gender'].value_counts()
+                            sizes = df_gender.values
+                            label = df_gender.index
+                            explode = [0,0.1]                    
+                            m_figure8 = Figure(figsize=(8,6), dpi=70)
+                            m_figure8.suptitle("Pie Chart for Gender for the {} Data".format(city.upper()))
+                            m_plot8 = m_figure8.add_subplot(111)
+                            m_plot8.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
+                            
+                            self.canvas_plot8 = FigureCanvasTkAgg(m_figure8, self.plot_frame)
+                            self.canvas_plot8.draw()
+                            plots.append(self.canvas_plot8)  
+                            labels.append(label8)                              
+                            
+                            # Display earliest, most recent, and most common year of birth
+                            S_series =  df['Birth Year'].value_counts()
+                            year = df['Birth Year'] # assign the Birth year column to a variable(series)
+                            print('\nIn the {} Data, the earliest year of birth is {},\nthe most recent is {} and the most common is {}.'.\
+                                  format(city, str(np.min(year)), str(np.max(year)), str(np.bincount(year).argmax())))
+                            #=====Plot=====
+                            m_figure9 = Figure(figsize=(13,7), dpi=60)
+                            m_figure9.suptitle("Dot Plot for End Stations in the {} data".format(city.upper()))
+                            m_plot9 = m_figure9.add_subplot(111)
+                            m_plot9.vlines(x=list(S_series.index), ymin=0, ymax=np.max(S_series.values), color=background, alpha=0.7, linewidth=2)
+                            m_plot9.scatter(x=list(S_series.index), y=np.max(S_series.values), s=75, color=background, alpha=0.7)  
+                            m_plot9.set_xticklabels(S_series.index.str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})                            
+                                                    
+                            self.canvas_plot9 = FigureCanvasTkAgg(m_figure9, self.plot_frame)
+                            self.canvas_plot9.draw()
+                            plots.append(self.canvas_plot9)  
+                            labels.append(label9)                                               
                     #==========Start Loading========== 
                     #thread = threading.Thread(target=loop('no'))
                     #thread.start()    
                     #=====Call statistics and plot functions=======
                     time_stats()
                     station_stats()
-                    trip_duration_stats()
+                    user_stats()
                     
                     plots[0].get_tk_widget().pack(side=TOP)
                     self.plot_info.pack(side=BOTTOM)
