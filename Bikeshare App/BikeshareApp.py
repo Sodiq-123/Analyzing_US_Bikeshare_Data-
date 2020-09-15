@@ -353,7 +353,36 @@ class Bikeshare:
                         self.canvas_plot6.draw()
                         plots.append(self.canvas_plot6)  
                         labels.append(label6) 
+                    def trip_duration_stats():
+                        """Displays statistics on the total and average trip duration."""
+                        self.status.configure(text='Calculating Trip Duration...')
+                        def time_data(seconds):
+                            """Convert time in seconds to minute and hours"""
+                            seconds = int(seconds)
+                            seconds = seconds % (24 * 3600) 
+                            hour = seconds // 3600
+                            seconds %= 3600
+                            minutes = seconds // 60
+                            seconds %= 60
+                            return hour, minutes, seconds
                         
+                        td_series = df['Trip Duration'].value_counts()
+                        total = time_data(np.sum(df['Trip Duration'])) # display total travel time
+                        mean = time_data(np.mean(df['Trip Duration'])) # display mean travel time
+                        label7 = "The Total travel time is {} hours {} minutes and {} seconds.".format(total[0],total[1],total[2])+\
+                            "\nThe Average travel time is {} hours {} minutes and {} seconds.".format(mean[0],mean[1],mean[2])   
+                        #=====Plot======
+                        m_figure7 = Figure(figsize=(9,6), dpi=70)
+                        m_figure7.suptitle("Bar Chart for Trip Duration of the {} Data".format(city.upper()))
+                        m_plot7 = m_figure7.add_subplot(111)
+                        m_plot7.bar(list(td_series.index)[0:30], list(td_series.values)[0:30], color=background)
+                        m_plot7.set_xlabel("Trip Duration in seconds")
+                        m_plot7.set_ylabel("Count")
+                        
+                        self.canvas_plot7 = FigureCanvasTkAgg(m_figure7, self.plot_frame)
+                        self.canvas_plot7.draw()
+                        plots.append(self.canvas_plot7)  
+                        labels.append(label7)                        
                     def user_stats():
                         """Displays statistics on bikeshare users."""
                         self.status.configure(text='Calculating User Stats...')
@@ -362,7 +391,7 @@ class Bikeshare:
                         subscribers = len(df.loc[df['User Type'] == 'Subscriber']) # locate all rows within the User Type column where value is subscriber and count them
                         customers = len(df.loc[df['User Type'] == 'Customer']) 
                         dependents = len(df.loc[df['User Type'] == 'Dependent'])
-                        label7 = "There are {} Subscribers, {} Customers and {} Dependent in the {} Data".format(subscribers, customers, dependents, city)   
+                        label8 = "There are {} Subscribers, {} Customers and {} Dependent in the {} Data".format(subscribers, customers, dependents, city)   
                         #=====Plot======
                         df_user = df['User Type'].value_counts()
                         sizes = df_user.values
@@ -372,59 +401,63 @@ class Bikeshare:
                             explode.extend([0.1,0,0])
                         else:
                             explode.extend([0.1,0])
-                        m_figure7 = Figure(figsize=(8,6), dpi=70)
-                        m_figure7.suptitle("Pie Chart for Types of Users for the {} Data".format(city.upper()))
-                        m_plot7 = m_figure7.add_subplot(111)
-                        m_plot7.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
+                        m_figure8 = Figure(figsize=(8,6), dpi=70)
+                        m_figure8.suptitle("Pie Chart for Types of Users for the {} Data".format(city.upper()))
+                        m_plot8 = m_figure8.add_subplot(111)
+                        m_plot8.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
                         
-                        self.canvas_plot7 = FigureCanvasTkAgg(m_figure7, self.plot_frame)
-                        self.canvas_plot7.draw()
-                        plots.append(self.canvas_plot7)  
-                        labels.append(label7)                        
+                        self.canvas_plot8 = FigureCanvasTkAgg(m_figure8, self.plot_frame)
+                        self.canvas_plot8.draw()
+                        plots.append(self.canvas_plot8)  
+                        labels.append(label8)                        
                         # The Gender and Birth year attributes only exists in the chicago and new york data
                         if city == 'chicago' or city == 'new york': 
                             # Display counts of gender
                             male = len(df.loc[df['Gender'] == 'Male']) # locate all rows within the Gender column where value is Malw and count them
                             female = len(df.loc[df['Gender'] == 'Female'])   
-                            label8 = "There are {} Males and {} Females within the {} Data".format(male, female, city)
+                            label9 = "There are {} Males and {} Females within the {} Data".format(male, female, city)
                             #=====Plot======
                             df_gender = df['Gender'].value_counts()
                             sizes = df_gender.values
                             label = df_gender.index
                             explode = [0,0.1]                    
-                            m_figure8 = Figure(figsize=(8,6), dpi=70)
-                            m_figure8.suptitle("Pie Chart for Gender for the {} Data".format(city.upper()))
-                            m_plot8 = m_figure8.add_subplot(111)
-                            m_plot8.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
-                            
-                            self.canvas_plot8 = FigureCanvasTkAgg(m_figure8, self.plot_frame)
-                            self.canvas_plot8.draw()
-                            plots.append(self.canvas_plot8)  
-                            labels.append(label8)                              
-                            
-                            # Display earliest, most recent, and most common year of birth
-                            S_series =  df['Birth Year'].value_counts()
-                            year = df['Birth Year'] # assign the Birth year column to a variable(series)
-                            print('\nIn the {} Data, the earliest year of birth is {},\nthe most recent is {} and the most common is {}.'.\
-                                  format(city, str(np.min(year)), str(np.max(year)), str(np.bincount(year).argmax())))
-                            #=====Plot=====
-                            m_figure9 = Figure(figsize=(13,7), dpi=60)
-                            m_figure9.suptitle("Dot Plot for End Stations in the {} data".format(city.upper()))
+                            m_figure9 = Figure(figsize=(8,6), dpi=70)
+                            m_figure9.suptitle("Pie Chart for Gender for the {} Data".format(city.upper()))
                             m_plot9 = m_figure9.add_subplot(111)
-                            m_plot9.vlines(x=list(S_series.index), ymin=0, ymax=np.max(S_series.values), color=background, alpha=0.7, linewidth=2)
-                            m_plot9.scatter(x=list(S_series.index), y=np.max(S_series.values), s=75, color=background, alpha=0.7)  
-                            m_plot9.set_xticklabels(S_series.index.str.upper(), rotation=30, fontdict={'horizontalalignment': 'right', 'size':8})                            
-                                                    
+                            m_plot9.pie(sizes, explode=explode, labels=label, autopct='%1.1f%%',shadow=True, startangle=90)
+                            
                             self.canvas_plot9 = FigureCanvasTkAgg(m_figure9, self.plot_frame)
                             self.canvas_plot9.draw()
                             plots.append(self.canvas_plot9)  
-                            labels.append(label9)                                               
+                            labels.append(label9)                              
+                            
+                            # Display earliest, most recent, and most common year of birth
+                            y_series = df['Birth Year'].value_counts()
+                            year = df['Birth Year'] # assign the Birth year column to a variable(series)
+                            label10 = 'In the {} Data, the earliest year of birth is {},\nthe most recent is {} and the most common is {}.'.\
+                                  format(city, str(np.min(year)), str(np.max(year)), str(np.bincount(year).argmax()))
+                            #=====Plot======
+                            m_figure10 = Figure(figsize=(11,6), dpi=70)
+                            m_figure10.suptitle("Bar Chart for Birth Year of the {} Data".format(city.upper()))
+                            m_plot10 = m_figure10.add_subplot(111)
+                            m_plot10.bar(y_series.index[0:30], y_series.values[0:30], color=background)
+                            m_plot10.set_xlabel("Birth Year")
+                            m_plot10.set_ylabel("Count")                          
+                            
+                            self.canvas_plot10 = FigureCanvasTkAgg(m_figure10, self.plot_frame)
+                            self.canvas_plot10.draw()
+                            plots.append(self.canvas_plot10)  
+                            labels.append(label10)           
+                            
+                            
+    
                     #==========Start Loading========== 
                     #thread = threading.Thread(target=loop('no'))
                     #thread.start()    
                     #=====Call statistics and plot functions=======
                     time_stats()
                     station_stats()
+                    trip_duration_stats()
                     user_stats()
                     
                     plots[0].get_tk_widget().pack(side=TOP)
