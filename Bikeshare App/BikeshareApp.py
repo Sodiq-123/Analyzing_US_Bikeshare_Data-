@@ -53,7 +53,7 @@ class Bikeshare:
             self.plot_info = Label(self.plot_frame,text='',font=('arial',12),bg=background,fg=foreground)
             
             self.status_frame = Frame(self.master,width=800,height=50,bg=background,bd=1,relief='sunken')
-            self.status_frame.place(x=0,y=580)
+            self.status_frame.place(x=0,y=575)
             self.status = Label(self.status_frame,text='',font=('normal',8),fg=foreground,bg=background)
             self.status.place(x=0,y=0)     
             #==============================Third Page=================================
@@ -74,7 +74,17 @@ class Bikeshare:
 
                 #==========================Filter Options==========================
                 self.info4 = Label(self.master,text='Filter Option',font=('arial',15,'bold'),fg=foreground,bg=background)
-                self.info4.place(x=290,y=15)                            
+                self.info4.place(x=290,y=15)  
+                def question():
+                    text= """Data filter options\n
+                    Select month and choose month name to filter dataset by month\n
+                    Select day and choose day to filter dataset by day\n
+                    Select day and both choose day and month to filter dataset by day and month\n
+                    Do not select if you don't wish to filter"""
+                    self.info5 = Label(self.master,text=text,font=('normal',9),bg='#7e7e7e',fg='#000000',bd=2,relief='ridge')
+                    self.info5.place(x=416,y=15,width=350,height=180)
+                self.question_btn = Button(self.master,text='?',font=('normal',9),fg='#7e7e7e',bd=0,relief='flat',bg=background,command=question)
+                self.question_btn.place(x=416,y=15)
                 def check_box():
                     if m.get() == 1:
                         self.month_box.configure(state=NORMAL)
@@ -172,13 +182,14 @@ class Bikeshare:
                         pass
          
                     # ========Delete this widgets from the window===============
-                    self.info4.place_forget()
-                    self.month_btn.place_forget()
-                    self.day_btn.place_forget()
-                    self.month_box.place_forget()
-                    self.day_box.place_forget()                    
-                    self.continue_btn.place_forget()
-                    
+                    self.info4.destroy()
+                    self.question_btn.destroy()
+                    self.month_btn.destroy()
+                    self.day_btn.destroy()
+                    self.month_box.destroy()
+                    self.day_box.destroy()                    
+                    self.continue_btn.destroy()
+ 
                     #=============================Load Data=============================
                     df = ''
                     #CHICAGO
@@ -365,7 +376,7 @@ class Bikeshare:
                             minutes = seconds // 60
                             seconds %= 60
                             return hour, minutes, seconds
-                        
+                         
                         td_series = df['Trip Duration'].value_counts()
                         total = time_data(np.sum(df['Trip Duration'])) # display total travel time
                         mean = time_data(np.mean(df['Trip Duration'])) # display mean travel time
@@ -499,9 +510,19 @@ class Bikeshare:
                             previous_labels.pop(0)                            
                     
                     self.previous_btn = Button(self.master,text='<',font=('normal',35),fg=foreground,bd=0,relief='flat',bg=background,activebackground=background,command=_previous)
-                    self.previous_btn.place(x=15,y=440)
+                    self.previous_btn.place(x=12,y=440)
                     self.next_btn = Button(self.master,text='>',font=('normal',35),fg=foreground,bd=0,relief='flat',bg=background,activebackground=background,command=_next)
                     self.next_btn.place(x=733,y=440)
+                    #===============Reset Button==================
+                    def reset():
+                        self.plot_frame.destroy()
+                        _continue()
+                        self.previous_btn.destroy()
+                        self.next_btn.destroy()
+                        self.reset_btn.destroy()
+                    self.reset_btn = Button(self.master,text='Reset',font=('arial',12),bg='#afc3df',fg=background,bd=1,relief='ridge',activebackground=background,command=reset)
+                    self.reset_btn.place(x=340,y=530,width=100,height=28)                    
+                
                 self.continue_btn.place(x=357,y=130,width=100,height=28)
                 self.continue_btn.configure(command=_continue2)                
                                   
